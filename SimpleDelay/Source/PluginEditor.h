@@ -16,11 +16,11 @@
 //==============================================================================
 /**
 */
-class GuidevAudioProcessorEditor  : public AudioProcessorEditor
+class SimpleDelayAudioProcessorEditor  : public AudioProcessorEditor
 {
 public:
-    GuidevAudioProcessorEditor (GuidevAudioProcessor&);
-    ~GuidevAudioProcessorEditor();
+    SimpleDelayAudioProcessorEditor (SimpleDelayAudioProcessor&);
+    ~SimpleDelayAudioProcessorEditor();
 
     //==============================================================================
     void paint (Graphics&) override;
@@ -29,11 +29,11 @@ public:
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
-    GuidevAudioProcessor& processor;
+    SimpleDelayAudioProcessor& processor;
 
     TextButton button;
     TextButton left;
     TextButton right;
     
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GuidevAudioProcessorEditor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SimpleDelayAudioProcessorEditor)
 };

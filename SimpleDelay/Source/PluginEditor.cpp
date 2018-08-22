@@ -12,7 +12,7 @@
 #include "PluginEditor.h"
 
 //==============================================================================
-GuidevAudioProcessorEditor::GuidevAudioProcessorEditor (GuidevAudioProcessor& p)
+SimpleDelayAudioProcessorEditor::SimpleDelayAudioProcessorEditor (SimpleDelayAudioProcessor& p)
     : AudioProcessorEditor (&p), processor (p)
 {
     // Make sure that before the constructor has finished, you've set the
@@ -28,12 +28,12 @@ GuidevAudioProcessorEditor::GuidevAudioProcessorEditor (GuidevAudioProcessor& p)
 
 }
 
-GuidevAudioProcessorEditor::~GuidevAudioProcessorEditor()
+SimpleDelayAudioProcessorEditor::~SimpleDelayAudioProcessorEditor()
 {
 }
 
 //==============================================================================
-void GuidevAudioProcessorEditor::paint (Graphics& g)
+void SimpleDelayAudioProcessorEditor::paint (Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (Colours::black);
@@ -47,7 +47,7 @@ void GuidevAudioProcessorEditor::paint (Graphics& g)
 
 }
 
-void GuidevAudioProcessorEditor::resized()
+void SimpleDelayAudioProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..

@@ -11,16 +11,17 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "DelayBuffer.h"
 
 //==============================================================================
 /**
 */
-class GuidevAudioProcessor  : public AudioProcessor
+class SimpleDelayAudioProcessor  : public AudioProcessor
 {
 public:
     //==============================================================================
-    GuidevAudioProcessor();
-    ~GuidevAudioProcessor();
+    SimpleDelayAudioProcessor();
+    ~SimpleDelayAudioProcessor();
 
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
@@ -56,6 +57,15 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
 private:
+    DelayBuffer delayBuf;
+    DelayBuffer damp;
+    float maxDelay;
+    float curDelay;
+    float g;
+    float cutoff;
+    float wet, dry;
+    
+    
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GuidevAudioProcessor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SimpleDelayAudioProcessor)
 };

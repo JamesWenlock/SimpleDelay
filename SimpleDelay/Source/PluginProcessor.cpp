@@ -12,7 +12,7 @@
 #include "PluginEditor.h"
 
 //==============================================================================
-GuidevAudioProcessor::GuidevAudioProcessor()
+SimpleDelayAudioProcessor::SimpleDelayAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
      : AudioProcessor (BusesProperties()
                      #if ! JucePlugin_IsMidiEffect
@@ -24,19 +24,25 @@ GuidevAudioProcessor::GuidevAudioProcessor()
                        )
 #endif
 {
+    maxDelay = 3;
+    curDelay = 1;
+    g = 0.612;
+    cutoff = 20;
+    dry = 1;
+    wet = 0.5;
 }
 
-GuidevAudioProcessor::~GuidevAudioProcessor()
+SimpleDelayAudioProcessor::~SimpleDelayAudioProcessor()
 {
 }
 
 //==============================================================================
-const String GuidevAudioProcessor::getName() const
+const String SimpleDelayAudioProcessor::getName() const
 {
     return JucePlugin_Name;
 }
 
-bool GuidevAudioProcessor::acceptsMidi() const
+bool SimpleDelayAudioProcessor::acceptsMidi() const
 {
    #if JucePlugin_WantsMidiInput
     return true;
@@ -45,7 +51,7 @@ bool GuidevAudioProcessor::acceptsMidi() const
    #endif
 }
 
-bool GuidevAudioProcessor::producesMidi() const
+bool SimpleDelayAudioProcessor::producesMidi() const
 {
    #if JucePlugin_ProducesMidiOutput
     return true;
@@ -54,7 +60,7 @@ bool GuidevAudioProcessor::producesMidi() const
    #endif
 }
 
-bool GuidevAudioProcessor::isMidiEffect() const
+bool SimpleDelayAudioProcessor::isMidiEffect() const
 {
    #if JucePlugin_IsMidiEffect
     return true;
@@ -63,50 +69,52 @@ bool GuidevAudioProcessor::isMidiEffect() const
    #endif
 }
 
-double GuidevAudioProcessor::getTailLengthSeconds() const
+double SimpleDelayAudioProcessor::getTailLengthSeconds() const
 {
     return 0.0;
 }
 
-int GuidevAudioProcessor::getNumPrograms()
+int SimpleDelayAudioProcessor::getNumPrograms()
 {
     return 1;   // NB: some hosts don't cope very well if you tell them there are 0 programs,
                 // so this should be at least 1, even if you're not really implementing programs.
 }
 
-int GuidevAudioProcessor::getCurrentProgram()
+int SimpleDelayAudioProcessor::getCurrentProgram()
 {
     return 0;
 }
 
-void GuidevAudioProcessor::setCurrentProgram (int index)
+void SimpleDelayAudioProcessor::setCurrentProgram (int index)
 {
 }
 
-const String GuidevAudioProcessor::getProgramName (int index)
+const String SimpleDelayAudioProcessor::getProgramName (int index)
 {
     return {};
 }
 
-void GuidevAudioProcessor::changeProgramName (int index, const String& newName)
+void SimpleDelayAudioProcessor::changeProgramName (int index, const String& newName)
 {
 }
 
 //==============================================================================
-void GuidevAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
+void SimpleDelayAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
+    delayBuf = DelayBuffer(maxDelay * getSampleRate(), 2);
+    damp = DelayBuffer(getSampleRate(), 2);
 }
 
-void GuidevAudioProcessor::releaseResources()
+void SimpleDelayAudioProcessor::releaseResources()
 {
     // When playback stops, you can use this as an opportunity to free up any
     // spare memory, etc.
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
-bool GuidevAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
+bool SimpleDelayAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
   #if JucePlugin_IsMidiEffect
     ignoreUnused (layouts);
@@ -129,7 +137,7 @@ bool GuidevAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) c
 }
 #endif
 
-void GuidevAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
+void SimpleDelayAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
     ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
@@ -153,31 +161,43 @@ void GuidevAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         auto* channelData = buffer.getWritePointer (channel);
+        for (int sample = 0; sample < buffer.getNumSamples(); sample++) {
+            float delayOut = delayBuf.getOffset(channel, curDelay * getSampleRate());
+            float filterOut = 0;
+            damp.put(channel, delayOut);
+            float sum = 0;
+            for (int i = 0; i < cutoff; i++) {
+                sum += damp.getOffset(channel, i);
+            }
+            filterOut = sum / cutoff * g;
+            delayBuf.put(channel, channelData[sample] + filterOut);
+            channelData[sample] = (filterOut * wet) + (channelData[sample] * dry);
+        }
 
         // ..do something to the data...
     }
 }
 
 //==============================================================================
-bool GuidevAudioProcessor::hasEditor() const
+bool SimpleDelayAudioProcessor::hasEditor() const
 {
     return true; // (change this to false if you choose to not supply an editor)
 }
 
-AudioProcessorEditor* GuidevAudioProcessor::createEditor()
+AudioProcessorEditor* SimpleDelayAudioProcessor::createEditor()
 {
-    return new GuidevAudioProcessorEditor (*this);
+    return new SimpleDelayAudioProcessorEditor (*this);
 }
 
 //==============================================================================
-void GuidevAudioProcessor::getStateInformation (MemoryBlock& destData)
+void SimpleDelayAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
 }
 
-void GuidevAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
+void SimpleDelayAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
@@ -187,5 +207,5 @@ void GuidevAudioProcessor::setStateInformation (const void* data, int sizeInByte
 // This creates new instances of the plugin..
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
-    return new GuidevAudioProcessor();
+    return new SimpleDelayAudioProcessor();
 }
