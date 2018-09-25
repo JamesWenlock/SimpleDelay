@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT name="SimpleDelay" projectType="audioplug" buildStandalone="1"
-              jucerVersion="5.3.1" pluginFormats="buildVST,buildStandalone"
+              jucerVersion="5.3.2" pluginFormats="buildVST,buildStandalone"
               buildVST="1" buildVST3="0" buildAU="0" buildAUv3="0" buildRTAS="0"
-              buildAAX="0" enableIAA="0">
+              buildAAX="0" enableIAA="0" id="e9CNbF">
   <MAINGROUP id="dU8So3" name="SimpleDelay">
     <GROUP id="{A6B46EFF-53DD-3BB4-7C4E-8F543353AB84}" name="Source">
       <FILE id="eXslaV" name="DelayBuffer.h" compile="0" resource="0" file="Source/DelayBuffer.h"/>

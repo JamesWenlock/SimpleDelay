@@ -61,7 +61,7 @@ private:
     DelayBuffer damp;
     float maxDelay;
     float curDelay;
-    float g;
+    float g, gCross;
     float cutoff;
     float wet, dry;
     
