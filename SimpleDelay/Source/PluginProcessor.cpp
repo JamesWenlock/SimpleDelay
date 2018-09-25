@@ -25,10 +25,11 @@ SimpleDelayAudioProcessor::SimpleDelayAudioProcessor()
 #endif
 {
     maxDelay = 3;
-    curDelay = 1;
-    g = 0.612;
+    curDelay = 0.1;
+    g = 0.118;
+    gCross = 0.612;
     cutoff = 20;
-    dry = 1;
+    dry = 0.5;
     wet = 0.5;
 }
 
@@ -158,23 +159,42 @@ void SimpleDelayAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
     // the samples and the outer loop is handling the channels.
     // Alternatively, you can process the samples with the channels
     // interleaved by keeping the same state.
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        auto* channelData = buffer.getWritePointer (channel);
-        for (int sample = 0; sample < buffer.getNumSamples(); sample++) {
+    
+    // Buffer to contain the output samples for each channel's processing chain
+    float chainOuts[2];
+    // Iterate through every sample
+    for (int sample = 0; sample < buffer.getNumSamples(); sample++) {
+        // Iterate through every channel (TODO: SHOULD ONLY BE 2)
+        for (int channel = 0; channel < totalNumInputChannels; channel++) {
+            // get delay output
             float delayOut = delayBuf.getOffset(channel, curDelay * getSampleRate());
+            
+            // Dampen (low pass filter) the delay output
             float filterOut = 0;
             damp.put(channel, delayOut);
             float sum = 0;
             for (int i = 0; i < cutoff; i++) {
                 sum += damp.getOffset(channel, i);
             }
-            filterOut = sum / cutoff * g;
-            delayBuf.put(channel, channelData[sample] + filterOut);
-            channelData[sample] = (filterOut * wet) + (channelData[sample] * dry);
+            filterOut = sum / cutoff;
+            
+            // Get the incoming sample
+            float channelSample = buffer.getSample(channel, sample);
+            
+            // Set the processing chain output sample
+            chainOuts[channel] = channelSample + filterOut;
+            
+            // Set the outgoing sample
+            buffer.setSample(channel, sample, (filterOut * wet) + (channelSample * dry));
         }
-
-        // ..do something to the data...
+        
+        // Place samples into the delay buffers for each channel, including crossing
+        // This implicitly creates a 1 sample delay (delay offset of 0 will return
+        // data from previously processed sample as no sample is placed until after
+        // the processing chain is finished).
+        for (int i = 0; i < 2; i++) {
+            delayBuf.put(i, chainOuts[1 - i] * gCross + chainOuts[i] * g);
+        }
     }
 }
 
