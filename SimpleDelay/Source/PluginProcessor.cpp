@@ -31,6 +31,16 @@ SimpleDelayAudioProcessor::SimpleDelayAudioProcessor()
     cutoff = 20;
     dry = 0.5;
     wet = 0.5;
+    tableSize = 1 << 24;
+    int waveTableSize = tableSize;
+    waveTable.initialise([waveTableSize](size_t index) {return sin(2 * M_PI * index / (waveTableSize - 1));}, tableSize);
+    lMod = Osc(&waveTable);
+    rMod = Osc(&waveTable);
+    lModWidth = 0.5;
+    lModWidth = 0.4;
+    rModFreq = 4;
+    lModFreq = 6;
+    
 }
 
 SimpleDelayAudioProcessor::~SimpleDelayAudioProcessor()
@@ -167,8 +177,18 @@ void SimpleDelayAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
         // Iterate through every channel (TODO: SHOULD ONLY BE 2)
         for (int channel = 0; channel < totalNumInputChannels; channel++) {
             // get delay output
-            float delayOut = delayBuf.getOffset(channel, curDelay * getSampleRate());
-            
+            float delayOffset;
+            if (channel == 0) {
+                float maxWidth = std::min(curDelay, maxDelay - curDelay);
+                float lWidth = maxWidth * lModWidth;
+                delayOffset = (curDelay + lMod.get(getSampleRate(), lModFreq) * lWidth) * getSampleRate();
+            } else {
+                float maxWidth = std::min(curDelay, maxDelay - curDelay);
+                float rWidth = maxWidth * rModWidth;
+                delayOffset = (curDelay + rMod.get(getSampleRate(), rModFreq) * rWidth) * getSampleRate();
+            }
+            float delayOut = delayBuf.getOffset(channel, delayOffset);
+
             // Dampen (low pass filter) the delay output
             float filterOut = 0;
             damp.put(channel, delayOut);
@@ -177,17 +197,17 @@ void SimpleDelayAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
                 sum += damp.getOffset(channel, i);
             }
             filterOut = sum / cutoff;
-            
+
             // Get the incoming sample
             float channelSample = buffer.getSample(channel, sample);
-            
+
             // Set the processing chain output sample
             chainOuts[channel] = channelSample + filterOut;
-            
+
             // Set the outgoing sample
             buffer.setSample(channel, sample, (filterOut * wet) + (channelSample * dry));
         }
-        
+
         // Place samples into the delay buffers for each channel, including crossing
         // This implicitly creates a 1 sample delay (delay offset of 0 will return
         // data from previously processed sample as no sample is placed until after
