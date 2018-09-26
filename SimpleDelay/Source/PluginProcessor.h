@@ -12,6 +12,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "DelayBuffer.h"
+#include "Osc.h"
 
 //==============================================================================
 /**
@@ -59,6 +60,11 @@ public:
 private:
     DelayBuffer delayBuf;
     DelayBuffer damp;
+    dsp::LookupTable<float> waveTable;
+    unsigned int tableSize;
+    Osc lMod, rMod;
+    float lModWidth, rModWidth;
+    float lModFreq, rModFreq;
     float maxDelay;
     float curDelay;
     float g, gCross;
