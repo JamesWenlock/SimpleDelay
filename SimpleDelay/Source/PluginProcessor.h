@@ -56,6 +56,12 @@ public:
     //==============================================================================
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
+    
+    int rand;
+    float lCurDelay;
+    float rCurDelay;
+    int lCurRNG, rCurRNG;
+    float maxDelay;
 
 private:
     DelayBuffer delayBuf;
@@ -65,12 +71,9 @@ private:
     Osc lMod, rMod;
     float lModWidth, rModWidth;
     float lModFreq, rModFreq;
-    float maxDelay;
-    float curDelay;
     float g, gCross;
     float cutoff;
     float wet, dry;
-    
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SimpleDelayAudioProcessor)

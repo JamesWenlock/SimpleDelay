@@ -31,23 +31,21 @@ private:
 
     void buttonClicked(Button * thisBtn) override;
 
-    
+    float getRNG(int RNG, float lo, float hi);
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     SimpleDelayAudioProcessor& processor;
 
-    TextButton button;
+    Label debugText;
     TextButton left;
     TextButton right;
     
     int guiWidth;
     int guiHeight;
-    int randBtnSize;
     int lBtnSize;
     int rBtnSize;
     int btnMargin;
     int textSize;
     
-    String debugText;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SimpleDelayAudioProcessorEditor)
 };

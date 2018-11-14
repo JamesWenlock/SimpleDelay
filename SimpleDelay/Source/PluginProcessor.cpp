@@ -25,7 +25,10 @@ SimpleDelayAudioProcessor::SimpleDelayAudioProcessor()
 #endif
 {
     maxDelay = 3;
-    curDelay = 0.1;
+    lCurDelay = 0.1;
+    rCurDelay = 0.1;
+    lCurRNG = 273965;
+    rCurRNG = 987632;
     g = 0.118;
     gCross = 0.612;
     cutoff = 20;
@@ -36,8 +39,8 @@ SimpleDelayAudioProcessor::SimpleDelayAudioProcessor()
     waveTable.initialise([waveTableSize](size_t index) {return sin(2 * M_PI * index / (waveTableSize - 1));}, tableSize);
     lMod = Osc(&waveTable);
     rMod = Osc(&waveTable);
-    lModWidth = 0.5;
-    lModWidth = 0.4;
+    lModWidth = 0;
+    lModWidth = 0;
     rModFreq = 4;
     lModFreq = 6;
     
@@ -179,13 +182,13 @@ void SimpleDelayAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
             // get delay output
             float delayOffset;
             if (channel == 0) {
-                float maxWidth = std::min(curDelay, maxDelay - curDelay);
+                float maxWidth = std::min(lCurDelay, maxDelay - lCurDelay);
                 float lWidth = maxWidth * lModWidth;
-                delayOffset = (curDelay + lMod.get(getSampleRate(), lModFreq) * lWidth) * getSampleRate();
+                delayOffset = (lCurDelay + lMod.get(getSampleRate(), lModFreq) * lWidth) * getSampleRate();
             } else {
-                float maxWidth = std::min(curDelay, maxDelay - curDelay);
+                float maxWidth = std::min(rCurDelay, maxDelay - rCurDelay);
                 float rWidth = maxWidth * rModWidth;
-                delayOffset = (curDelay + rMod.get(getSampleRate(), rModFreq) * rWidth) * getSampleRate();
+                delayOffset = (rCurDelay + rMod.get(getSampleRate(), rModFreq) * rWidth) * getSampleRate();
             }
             float delayOut = delayBuf.getOffset(channel, delayOffset);
 

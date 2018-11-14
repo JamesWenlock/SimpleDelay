@@ -17,13 +17,12 @@ SimpleDelayAudioProcessorEditor::SimpleDelayAudioProcessorEditor (SimpleDelayAud
 {
     guiWidth = 400;
     guiHeight = 400;
-    randBtnSize = 200;
     lBtnSize = 200;
     rBtnSize = 200;
-    textSize = 100;
+    textSize = 300;
     btnMargin = 10;
     
-    debugText = "test";
+    debugText.setText("default", dontSendNotification);
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     setSize (guiWidth, guiHeight);
@@ -31,10 +30,9 @@ SimpleDelayAudioProcessorEditor::SimpleDelayAudioProcessorEditor (SimpleDelayAud
     left.setButtonText("left");
     right.setButtonText("right");
 
-    addAndMakeVisible(button);
     addAndMakeVisible(left);
     addAndMakeVisible(right);
-    button.addListener(this);
+    addAndMakeVisible(debugText);
     left.addListener(this);
     right.addListener(this);
 }
@@ -43,44 +41,36 @@ SimpleDelayAudioProcessorEditor::~SimpleDelayAudioProcessorEditor()
 {
 }
 
+float SimpleDelayAudioProcessorEditor::getRNG(int RNG, float lo, float hi) {
+    float range = hi - lo;
+    return (processor.rand % RNG) / (float) RNG * range + lo;
+}
+
 void SimpleDelayAudioProcessorEditor::buttonClicked(Button * thisBtn)
 {
-    debugText = "clicked";
     if (thisBtn == &left)
     {
-        debugText = "left";
+        debugText.setText("left", dontSendNotification);
     }
     else if (thisBtn == &right)
     {
-        debugText = "right";
+        processor.rand = rand();
+        processor.lCurDelay = getRNG(processor.lCurRNG, 0, processor.maxDelay);
+        processor.rCurDelay = getRNG(processor.rCurRNG,  0, processor.maxDelay);
+        debugText.setText("lCurDelay: " + (String) processor.lCurDelay + " | rCurDelay: " + (String) processor.rCurDelay, dontSendNotification);
     }
-    else if (thisBtn == &button)
-    {
-        debugText = "button";
-    }
-    resized();
 }
 
 //==============================================================================
 void SimpleDelayAudioProcessorEditor::paint (Graphics& g)
 {
-    /*    // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll (Colours::black);
 
-    g.setColour (Colours::red);
-    g.setFont (15.0f);
-    Path leftTriangle;
-    leftTriangle.addTriangle(10, 10, getWidth() - 10, getWidth() - 10, getHeight(), getHeight());
-    g.fillPath (leftTriangle);
-    g.setColour (Colours::black);
-    */
     // fill the whole window white
-    g.fillAll (Colours::white);
+    g.fillAll (Colours::black);
     // set the current drawing colour to black
     g.setColour (Colours::black);
     // set the font size and draw text to the screen
     g.setFont (15.0f);
-    g.drawFittedText (debugText, 0, 0, getWidth(), textSize, Justification::centred, 1);
 }
 
 void SimpleDelayAudioProcessorEditor::resized()
@@ -88,9 +78,7 @@ void SimpleDelayAudioProcessorEditor::resized()
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
     auto r = getLocalBounds();
-    r.removeFromTop(textSize);
-    button.setBounds(r.removeFromTop(randBtnSize).reduced(10));
+    debugText.setBounds(r.removeFromTop(textSize));
     left.setBounds(r.removeFromLeft(lBtnSize).reduced(10));
     right.setBounds(r.removeFromLeft(rBtnSize).reduced(10));
-
 }
