@@ -57,9 +57,10 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
     
+    static const int NUM_CHANNELS = 2;
+    int CUR_DELAY_RNG[NUM_CHANNELS] = {4721, 9732};
     int rand;
-    float lCurDelay;
-    float rCurDelay;
+    float curDelay[NUM_CHANNELS];
     int lCurRNG, rCurRNG;
     float maxDelay;
 
@@ -68,11 +69,12 @@ private:
     DelayBuffer damp;
     dsp::LookupTable<float> waveTable;
     unsigned int tableSize;
-    Osc lMod, rMod;
-    float lModWidth, rModWidth;
-    float lModFreq, rModFreq;
-    float g, gCross;
-    float cutoff;
+    Osc mod[NUM_CHANNELS];
+    float modWidth[NUM_CHANNELS];
+    float modFreq[NUM_CHANNELS];
+    float g[NUM_CHANNELS];
+    float gCross[NUM_CHANNELS];
+    float cutoff[NUM_CHANNELS];
     float wet, dry;
     
     //==============================================================================

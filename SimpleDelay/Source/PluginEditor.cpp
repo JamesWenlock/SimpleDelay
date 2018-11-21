@@ -55,9 +55,11 @@ void SimpleDelayAudioProcessorEditor::buttonClicked(Button * thisBtn)
     else if (thisBtn == &right)
     {
         processor.rand = rand();
-        processor.lCurDelay = getRNG(processor.lCurRNG, 0, processor.maxDelay);
-        processor.rCurDelay = getRNG(processor.rCurRNG,  0, processor.maxDelay);
-        debugText.setText("lCurDelay: " + (String) processor.lCurDelay + " | rCurDelay: " + (String) processor.rCurDelay, dontSendNotification);
+        for (int channel = 0; channel < processor.NUM_CHANNELS; channel++) {
+            processor.curDelay[channel] = getRNG(processor.CUR_DELAY_RNG[channel], 0, processor.maxDelay);
+        }
+        
+        debugText.setText("lCurDelay: " + (String) processor.curDelay[0] + " | rCurDelay: " + (String) processor.curDelay[1], dontSendNotification);
     }
 }
 
