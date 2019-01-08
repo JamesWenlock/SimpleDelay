@@ -43,7 +43,7 @@ SimpleDelayAudioProcessorEditor::~SimpleDelayAudioProcessorEditor()
 
 float SimpleDelayAudioProcessorEditor::getRNG(int RNG, float lo, float hi) {
     float range = hi - lo;
-    return (processor.rand % RNG) / (float) RNG * range + lo;
+    return (processor.seed % RNG) / (float) RNG * range + lo;
 }
 
 void SimpleDelayAudioProcessorEditor::buttonClicked(Button * thisBtn)
@@ -54,13 +54,58 @@ void SimpleDelayAudioProcessorEditor::buttonClicked(Button * thisBtn)
     }
     else if (thisBtn == &right)
     {
-        processor.rand = rand();
-        for (int channel = 0; channel < processor.NUM_CHANNELS; channel++) {
-            processor.curDelay[channel] = getRNG(processor.CUR_DELAY_RNG[channel], 0, processor.maxDelay);
-        }
-        
-        debugText.setText("lCurDelay: " + (String) processor.curDelay[0] + " | rCurDelay: " + (String) processor.curDelay[1], dontSendNotification);
+        calcParamVals();
     }
+}
+
+void SimpleDelayAudioProcessorEditor::calcParamVals()
+{
+    processor.seed = rand();
+    for (int channel = 0; channel < processor.NUM_CHANNELS; channel++) {
+        
+        int curDelayRNGInd = isSync(processor.CUR_DELAY_RNG[processor.SYNC_INDEX], processor.curDelaySync) ? 0 : channel;
+        processor.curDelay[channel] = getRNG(processor.CUR_DELAY_RNG[curDelayRNGInd],
+                                             processor.curDelayLo,
+                                             processor.curDelayHi);
+        
+        int modWidthRNGInd = isSync(processor.MOD_WIDTH_RNG[processor.SYNC_INDEX], processor.modWidthSync) ? 0 : channel;
+        processor.modWidth[channel] = getRNG(processor.MOD_WIDTH_RNG[modWidthRNGInd],
+                                             processor.modWidthLo,
+                                             processor.modWidthHi);
+        
+        int modFreqRNGInd = isSync(processor.MOD_FREQ_RNG[processor.SYNC_INDEX], processor.modFreqSync) ? 0 : channel;
+        processor.modFreq[channel] = getRNG(processor.MOD_FREQ_RNG[modFreqRNGInd],
+                                            processor.modFreqLo,
+                                            processor.modFreqHi);
+        
+        int gRNGInd = isSync(processor.G_RNG[processor.SYNC_INDEX], processor.gSync) ? 0 : channel;
+        processor.g[channel] = getRNG(processor.G_RNG[gRNGInd],
+                                            processor.gLo,
+                                            processor.gHi);
+        
+        int gCrossRNGInd = isSync(processor.G_CROSS_RNG[processor.SYNC_INDEX], processor.gCrossSync) ? 0 : channel;
+        processor.gCross[channel] = getRNG(processor.G_CROSS_RNG[gCrossRNGInd],
+                                            processor.gCrossLo,
+                                            processor.gCrossHi);
+        
+        int cutoffRNGInd = isSync(processor.CUTOFF_RNG[processor.SYNC_INDEX], processor.cutoffSync) ? 0 : channel;
+        processor.cutoff[channel] = getRNG(processor.CUTOFF_RNG[cutoffRNGInd],
+                                            processor.cutoffLo,
+                                            processor.cutoffHi);
+
+        processor.cutoff[channel] = (int) getRNG(processor.CUTOFF_RNG[channel], 1, 21);
+    }
+    
+    debugText.setText("lCurDelay: " + (String) processor.curDelay[0] + " | rCurDelay: " + (String) processor.curDelay[1]
+                      + "\nlModWidth: " + (String) processor.modWidth[0] + " | rModWidth: " + (String) processor.modWidth[1]
+                      + "\nlModFreq: " + (String) processor.modFreq[0] + " | rModFreq: " + (String) processor.modFreq[1]
+                      + "\nlG: " + (String) processor.g[0] + " | rG: " + (String) processor.g[1]
+                      + "\nlGCross: " + (String) processor.gCross[0] + " | rGCross: " + (String) processor.gCross[1]
+                      + "\nlCutoff: " + (String) processor.cutoff[0] + " | rCutoff: " + (String) processor.cutoff[1], dontSendNotification);
+}
+
+bool SimpleDelayAudioProcessorEditor::isSync(int rng, float likelihood) {
+    return getRNG(rng, 0, 1) > likelihood;
 }
 
 //==============================================================================

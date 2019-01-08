@@ -24,7 +24,6 @@ SimpleDelayAudioProcessor::SimpleDelayAudioProcessor()
                        )
 #endif
 {
-    maxDelay = 3;
     curDelay[0] = 0.1;
     curDelay[1] = 0.1;
     g[0] = 0.118;
@@ -118,7 +117,7 @@ void SimpleDelayAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-    delayBuf = DelayBuffer(maxDelay * getSampleRate(), 2);
+    delayBuf = DelayBuffer(MAX_DELAY * getSampleRate(), 2);
     damp = DelayBuffer(getSampleRate(), 2);
 }
 
@@ -182,7 +181,7 @@ void SimpleDelayAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
         for (int channel = 0; channel < totalNumInputChannels; channel++) {
             // get delay output
             float delayOffset;
-            float maxWidth = std::min(curDelay[channel], maxDelay - curDelay[channel]);
+            float maxWidth = std::min(curDelay[channel], MAX_DELAY - curDelay[channel]);
             float width = maxWidth * modWidth[channel];
             delayOffset = (curDelay[channel] + mod[channel].get(getSampleRate(), modFreq[channel]) * width) * getSampleRate();
 

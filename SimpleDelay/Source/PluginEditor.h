@@ -30,6 +30,8 @@ public:
 private:
 
     void buttonClicked(Button * thisBtn) override;
+    void calcParamVals();
+    bool isSync(int rng, float likelihood);
 
     float getRNG(int RNG, float lo, float hi);
     // This reference is provided as a quick way for your editor to
