@@ -61,6 +61,9 @@ void SimpleDelayAudioProcessorEditor::buttonClicked(Button * thisBtn)
 void SimpleDelayAudioProcessorEditor::calcParamVals()
 {
     processor.seed = rand();
+    
+    processor.mix = getRNG(processor.MIX_RNG, processor.mixLo, processor.mixHi);
+    
     for (int channel = 0; channel < processor.NUM_CHANNELS; channel++) {
         
         int curDelayRNGInd = isSync(processor.CUR_DELAY_RNG[processor.SYNC_INDEX], processor.curDelaySync) ? 0 : channel;
@@ -101,7 +104,9 @@ void SimpleDelayAudioProcessorEditor::calcParamVals()
                       + "\nlModFreq: " + (String) processor.modFreq[0] + " | rModFreq: " + (String) processor.modFreq[1]
                       + "\nlG: " + (String) processor.g[0] + " | rG: " + (String) processor.g[1]
                       + "\nlGCross: " + (String) processor.gCross[0] + " | rGCross: " + (String) processor.gCross[1]
-                      + "\nlCutoff: " + (String) processor.cutoff[0] + " | rCutoff: " + (String) processor.cutoff[1], dontSendNotification);
+                      + "\nlCutoff: " + (String) processor.cutoff[0] + " | rCutoff: " + (String) processor.cutoff[1]
+                      + "\nmix: " + (String) processor.mix
+                      , dontSendNotification);
 }
 
 bool SimpleDelayAudioProcessorEditor::isSync(int rng, float likelihood) {

@@ -103,11 +103,18 @@ public:
     
     // Feedback cutoff frequency
     // TODO: CHANGE THIS TO FREQUENCY VALUE ONCE FILTER IS CORRECTED
-    int CUTOFF_RNG[NUM_CHANNELS + 1] = {47123, 23784, 12334};
+    const int CUTOFF_RNG[NUM_CHANNELS + 1] = {47123, 23784, 12334};
     float cutoff[NUM_CHANNELS];
     float cutoffSync = 0.5;
     float cutoffLo = 1;
     float cutoffHi = 20;
+    
+    // Mix
+    // 0 = dry, 1 = wet
+    const int MIX_RNG = 10234;
+    float mix;
+    float mixLo = 0;
+    float mixHi = 1;
     
 private:
     DelayBuffer delayBuf;
@@ -115,7 +122,6 @@ private:
     dsp::LookupTable<float> waveTable;
     unsigned int tableSize;
     Osc mod[NUM_CHANNELS];
-    float wet, dry;
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SimpleDelayAudioProcessor)

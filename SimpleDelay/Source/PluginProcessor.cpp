@@ -32,8 +32,7 @@ SimpleDelayAudioProcessor::SimpleDelayAudioProcessor()
     gCross[1] = 0.612;
     cutoff[0] = 20;
     cutoff[1] = 20;
-    dry = 0.5;
-    wet = 0.5;
+    mix = 0.5;
     tableSize = 1 << 24;
     int waveTableSize = tableSize;
     waveTable.initialise([waveTableSize](size_t index) {return sin(2 * M_PI * index / (waveTableSize - 1));}, tableSize);
@@ -201,9 +200,14 @@ void SimpleDelayAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
 
             // Set the processing chain output sample
             chainOuts[channel] = channelSample + filterOut;
-
+            
+            // Mix outgoing signals
+            float wetSig = filterOut * sin(M_PI / 2 * mix);
+            float drySig = channelSample * cos(M_PI / 2 * mix);
+            float output = drySig + wetSig;
+            
             // Set the outgoing sample
-            buffer.setSample(channel, sample, (filterOut * wet) + (channelSample * dry));
+            buffer.setSample(channel, sample, output);
         }
 
         // Place samples into the delay buffers for each channel, including crossing
