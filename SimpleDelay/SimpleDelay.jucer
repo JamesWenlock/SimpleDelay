@@ -4,7 +4,9 @@
               id="e9CNbF" pluginFormats="buildVST3">
   <MAINGROUP id="dU8So3" name="SimpleDelay">
     <GROUP id="{A6B46EFF-53DD-3BB4-7C4E-8F543353AB84}" name="Source">
+      <FILE id="oOcZtK" name="RandParam.cpp" compile="1" resource="0" file="Source/RandParam.cpp"/>
       <FILE id="eXslaV" name="DelayBuffer.h" compile="0" resource="0" file="Source/DelayBuffer.h"/>
+      <FILE id="PMYCWa" name="RandParam.h" compile="0" resource="0" file="Source/RandParam.h"/>
       <FILE id="VpzcNZ" name="DelayBuffer.cpp" compile="1" resource="0" file="Source/DelayBuffer.cpp"/>
       <FILE id="bRS09Y" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
