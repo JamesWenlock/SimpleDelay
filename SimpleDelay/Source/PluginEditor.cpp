@@ -92,7 +92,7 @@ void SimpleDelayAudioProcessorEditor::calcParamVals()
                                             processor.gCrossHi);
         
         int cutoffRNGInd = isSync(processor.CUTOFF_RNG[processor.SYNC_INDEX], processor.cutoffSync) ? 0 : channel;
-        processor.cutoff[channel] = getRNG(processor.CUTOFF_RNG[cutoffRNGInd],
+        processor.cutoff[channel] = getRNG(processor.CUTOFF_RNG [cutoffRNGInd],
                                             processor.cutoffLo,
                                             processor.cutoffHi);
 
@@ -112,6 +112,37 @@ void SimpleDelayAudioProcessorEditor::calcParamVals()
 bool SimpleDelayAudioProcessorEditor::isSync(int rng, float likelihood) {
     return getRNG(rng, 0, 1) > likelihood;
 }
+
+/*
+ float mapExp(float input) {
+    var base = 4;
+    return pow(base, (input + 1)) * (1 / (base * (base - 1)))
+ }
+
+ float mapBi(float input) {
+    if (input > likelihood)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0
+    }
+ }
+ 
+ float map(float input) {
+    var range = hi - lo;
+    var output = input;
+    switch(curve)
+    {
+        case "exp" : output = mapExp(input);
+        break;
+        case "bi" : output = mapBi(input)
+        break;
+    }
+    output = output * range + lo;
+ }
+ */
 
 //==============================================================================
 void SimpleDelayAudioProcessorEditor::paint (Graphics& g)
