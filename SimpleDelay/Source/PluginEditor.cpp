@@ -64,16 +64,20 @@ void SimpleDelayAudioProcessorEditor::calcParamVals()
     
     processor.mix.updateParam(processor.seed);
     processor.cutoff.updateParam(processor.seed);
+    processor.hasCross.updateParam(processor.seed);
     processor.gCross.updateParam(processor.seed);
     processor.g.updateParam(processor.seed);
+    processor.hasMod.updateParam(processor.seed);
     processor.modFreq.updateParam(processor.seed);
     processor.modWidth.updateParam(processor.seed);
     processor.curDelay.updateParam(processor.seed);
     
     debugText.setText("lCurDelay: " + (String) processor.curDelay.get(0) + " | rCurDelay: " + (String) processor.curDelay.get(1)
+                      + "\nHasMod: " + (String) processor.hasMod.get(0)
                       + "\nlModWidth: " + (String) processor.modWidth.get(0) + " | rModWidth: " + (String) processor.modWidth.get(1)
                       + "\nlModFreq: " + (String) processor.modFreq.get(0) + " | rModFreq: " + (String) processor.modFreq.get(1)
                       + "\nlG: " + (String) processor.g.get(0) + " | rG: " + (String) processor.g.get(1)
+                      + "\nHasCross: " + (String) processor.hasCross.get(0)
                       + "\nlGCross: " + (String) processor.gCross.get(0) + " | rGCross: " + (String) processor.gCross.get(1)
                       + "\nlCutoff: " + (String) processor.cutoff.get(0) + " | rCutoff: " + (String) processor.cutoff.get(1)
                       + "\nmix: " + (String) processor.mix.get(0)

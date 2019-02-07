@@ -167,7 +167,7 @@ void SimpleDelayAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
             // get delay output
             float delayOffset;
             float maxWidth = std::min(curDelay.get(channel), MAX_DELAY - curDelay.get(channel));
-            float width = maxWidth * modWidth.get(channel);
+            float width = hasMod.get(0) ? maxWidth * modWidth.get(channel) : 0;
             delayOffset = (curDelay.get(channel) + mod[channel].get(getSampleRate(), modFreq.get(channel)) * width) * getSampleRate();
 
             float delayOut = delayBuf.getOffset(channel, delayOffset);
@@ -201,7 +201,7 @@ void SimpleDelayAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
         // data from previously processed sample as no sample is placed until after
         // the processing chain is finished).
         for (int channel = 0; channel < 2; channel++) {
-            delayBuf.put(channel, chainOuts[1 - channel] * gCross.get(channel) + chainOuts[channel] * g.get(channel));
+            delayBuf.put(channel, chainOuts[1 - channel] * gCross.get(channel) * hasCross.get(0) + chainOuts[channel] * g.get(channel));
         }
     }
 }

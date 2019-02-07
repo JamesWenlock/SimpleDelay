@@ -72,6 +72,13 @@ public:
     float curDelayHi = MAX_DELAY;
     RandParam curDelay = RandParam(2, true, CUR_DELAY_RNG, curDelayLo, curDelayHi, curDelaySync, 0, "exp");
     
+    // Whether or not the delay has modulation
+    int HAS_MOD_RNG[1] = {4682};
+    float hasModLo = 0;
+    float hasModHi = 1;
+    float hasModLikelihood = 0.25;
+    RandParam hasMod = RandParam(1, false, HAS_MOD_RNG, hasModLo, hasModHi, 0, hasModLikelihood, "bi");
+    
     // Mod width
     int MOD_WIDTH_RNG[NUM_CHANNELS + 1] = {10437, 6321, 8534};
     float modWidthSync = 0.5;
@@ -95,6 +102,13 @@ public:
     float gHi = 0.8732;
     RandParam g = RandParam(2, true, G_RNG, gLo, gHi, gSync, 0, "lin");
     
+    // Whether or not it has cross feedback
+    int HAS_CROSS_RNG[NUM_CHANNELS + 1] = {8427};
+    float hasCrossLo = 0;
+    float hasCrossHi = 1;
+    float hasCrossLikelihood = 0.5;
+    RandParam hasCross = RandParam(1, false, HAS_CROSS_RNG, hasCrossLo, hasCrossHi, 0, hasCrossLikelihood, "bi");
+    
     // Cross feedback
     int G_CROSS_RNG[NUM_CHANNELS + 1] = {3716, 12474, 67543};
     float gCrossSync = 0.5;
@@ -113,7 +127,9 @@ public:
     // Mix
     // 0 = dry, 1 = wet
     int MIX_RNG[1] = {10234};
-    RandParam mix = RandParam(1, false, MIX_RNG, 0, 1, 0, 0, "lin");
+    float mixLo = 0;
+    float mixHi = 1;
+    RandParam mix = RandParam(1, false, MIX_RNG, mixLo, mixHi, 0, 0, "lin");
     
 private:
     DelayBuffer delayBuf;
