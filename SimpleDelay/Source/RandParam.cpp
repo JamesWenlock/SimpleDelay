@@ -9,6 +9,7 @@
 */
 
 #include "RandParam.h"
+#include <cmath>
 
 //==============================================================================
 RandParam::RandParam(int numChannels, bool hasSync, int *RNG, float lo,
@@ -51,7 +52,8 @@ void RandParam::updateParam(int seed) {
     }
     
     for (int channel = 0; channel < numChannels; channel++) {
-        val[channel] = 
+        int rngChannel = isSync ? 0 : channel;
+        val[channel] = map(getRNG(RNG[rngChannel], seed));
     }
 }
 
@@ -60,6 +62,21 @@ float RandParam::get(int channel) {
     return val[channel];
 }
 
-float getRNG(int RNG, int seed) {
+float RandParam::getRNG(int RNG, int seed) {
     return (seed % RNG) / (float) RNG;
+}
+
+float RandParam::map(float input) {
+    float range = hi - lo;
+    float output = input;
+    
+    if (curve == "exp") {
+        output = pow(expBase, (input + 1.0)) * (1.0 / (expBase * (expBase - 1.0)));
+    } else if (curve == "bi") {
+        output = input < biLikelihood;
+    }
+    
+    output = output * range + lo;
+    
+    return output;
 }

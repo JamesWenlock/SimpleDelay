@@ -62,50 +62,21 @@ void SimpleDelayAudioProcessorEditor::calcParamVals()
 {
     processor.seed = rand();
     
-    processor.mix = getRNG(processor.MIX_RNG, processor.mixLo, processor.mixHi);
+    processor.mix.updateParam(processor.seed);
+    processor.cutoff.updateParam(processor.seed);
+    processor.gCross.updateParam(processor.seed);
+    processor.g.updateParam(processor.seed);
+    processor.modFreq.updateParam(processor.seed);
+    processor.modWidth.updateParam(processor.seed);
+    processor.curDelay.updateParam(processor.seed);
     
-    for (int channel = 0; channel < processor.NUM_CHANNELS; channel++) {
-        
-        int curDelayRNGInd = isSync(processor.CUR_DELAY_RNG[processor.SYNC_INDEX], processor.curDelaySync) ? 0 : channel;
-        processor.curDelay[channel] = getRNG(processor.CUR_DELAY_RNG[curDelayRNGInd],
-                                             processor.curDelayLo,
-                                             processor.curDelayHi);
-        
-        int modWidthRNGInd = isSync(processor.MOD_WIDTH_RNG[processor.SYNC_INDEX], processor.modWidthSync) ? 0 : channel;
-        processor.modWidth[channel] = getRNG(processor.MOD_WIDTH_RNG[modWidthRNGInd],
-                                             processor.modWidthLo,
-                                             processor.modWidthHi);
-        
-        int modFreqRNGInd = isSync(processor.MOD_FREQ_RNG[processor.SYNC_INDEX], processor.modFreqSync) ? 0 : channel;
-        processor.modFreq[channel] = getRNG(processor.MOD_FREQ_RNG[modFreqRNGInd],
-                                            processor.modFreqLo,
-                                            processor.modFreqHi);
-        
-        int gRNGInd = isSync(processor.G_RNG[processor.SYNC_INDEX], processor.gSync) ? 0 : channel;
-        processor.g[channel] = getRNG(processor.G_RNG[gRNGInd],
-                                            processor.gLo,
-                                            processor.gHi);
-        
-        int gCrossRNGInd = isSync(processor.G_CROSS_RNG[processor.SYNC_INDEX], processor.gCrossSync) ? 0 : channel;
-        processor.gCross[channel] = getRNG(processor.G_CROSS_RNG[gCrossRNGInd],
-                                            processor.gCrossLo,
-                                            processor.gCrossHi);
-        
-        int cutoffRNGInd = isSync(processor.CUTOFF_RNG[processor.SYNC_INDEX], processor.cutoffSync) ? 0 : channel;
-        processor.cutoff[channel] = getRNG(processor.CUTOFF_RNG [cutoffRNGInd],
-                                            processor.cutoffLo,
-                                            processor.cutoffHi);
-
-        processor.cutoff[channel] = (int) getRNG(processor.CUTOFF_RNG[channel], 1, 21);
-    }
-    
-    debugText.setText("lCurDelay: " + (String) processor.curDelay[0] + " | rCurDelay: " + (String) processor.curDelay[1]
-                      + "\nlModWidth: " + (String) processor.modWidth[0] + " | rModWidth: " + (String) processor.modWidth[1]
-                      + "\nlModFreq: " + (String) processor.modFreq[0] + " | rModFreq: " + (String) processor.modFreq[1]
-                      + "\nlG: " + (String) processor.g[0] + " | rG: " + (String) processor.g[1]
-                      + "\nlGCross: " + (String) processor.gCross[0] + " | rGCross: " + (String) processor.gCross[1]
-                      + "\nlCutoff: " + (String) processor.cutoff[0] + " | rCutoff: " + (String) processor.cutoff[1]
-                      + "\nmix: " + (String) processor.mix
+    debugText.setText("lCurDelay: " + (String) processor.curDelay.get(0) + " | rCurDelay: " + (String) processor.curDelay.get(1)
+                      + "\nlModWidth: " + (String) processor.modWidth.get(0) + " | rModWidth: " + (String) processor.modWidth.get(1)
+                      + "\nlModFreq: " + (String) processor.modFreq.get(0) + " | rModFreq: " + (String) processor.modFreq.get(1)
+                      + "\nlG: " + (String) processor.g.get(0) + " | rG: " + (String) processor.g.get(1)
+                      + "\nlGCross: " + (String) processor.gCross.get(0) + " | rGCross: " + (String) processor.gCross.get(1)
+                      + "\nlCutoff: " + (String) processor.cutoff.get(0) + " | rCutoff: " + (String) processor.cutoff.get(1)
+                      + "\nmix: " + (String) processor.mix.get(0)
                       , dontSendNotification);
 }
 
