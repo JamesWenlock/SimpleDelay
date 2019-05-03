@@ -11,6 +11,7 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "DelayBuffer.h"
 
 //==============================================================================
 /**
@@ -27,5 +28,12 @@ public:
     float get(int channel);
     
 private:
-    
+    int numChannels;
+    float cutoffFreq;
+    float damping;
+    float sampleRate;
+    float inputDelayCoeff[3];
+    float outputDelayCoeff[3];
+    DelayBuffer inputDelay;
+    DelayBuffer outputDelay;
 };
