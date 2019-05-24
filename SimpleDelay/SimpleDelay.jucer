@@ -16,6 +16,9 @@
       <FILE id="juHq8L" name="Osc.cpp" compile="1" resource="0" file="Source/Osc.cpp"/>
       <FILE id="fFST4W" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/PluginEditor.cpp"/>
+      <FILE id="uwTZDJ" name="LowpassFilter.h" compile="0" resource="0" file="Source/LowpassFilter.h"/>
+      <FILE id="tD7Kgp" name="LowpassFilter.cpp" compile="1" resource="0"
+            file="Source/LowpassFilter.cpp"/>
       <FILE id="CsuoUH" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
   </MAINGROUP>
