@@ -24,27 +24,11 @@ SimpleDelayAudioProcessor::SimpleDelayAudioProcessor()
                        )
 #endif
 {
-    maxDelay = 3;
-    curDelay[0] = 0.1;
-    curDelay[1] = 0.1;
-    g[0] = 0.118;
-    g[1] = 0.118;
-    gCross[0] = 0.612;
-    gCross[1] = 0.612;
-    cutoff[0] = 20;
-    cutoff[1] = 20;
-    dry = 0.5;
-    wet = 0.5;
     tableSize = 1 << 24;
     int waveTableSize = tableSize;
     waveTable.initialise([waveTableSize](size_t index) {return sin(2 * M_PI * index / (waveTableSize - 1));}, tableSize);
     mod[0] = Osc(&waveTable);
     mod[1] = Osc(&waveTable);
-    modWidth[0] = 0;
-    modWidth[1] = 0;
-    modFreq[0] = 4;
-    modFreq[1] = 6;
-    
 }
 
 SimpleDelayAudioProcessor::~SimpleDelayAudioProcessor()
@@ -118,7 +102,7 @@ void SimpleDelayAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-    delayBuf = DelayBuffer(maxDelay * getSampleRate(), 2);
+    delayBuf = DelayBuffer(MAX_DELAY * getSampleRate(), 2);
     damp = DelayBuffer(getSampleRate(), 2);
 }
 
@@ -182,9 +166,9 @@ void SimpleDelayAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
         for (int channel = 0; channel < totalNumInputChannels; channel++) {
             // get delay output
             float delayOffset;
-            float maxWidth = std::min(curDelay[channel], maxDelay - curDelay[channel]);
-            float width = maxWidth * modWidth[channel];
-            delayOffset = (curDelay[channel] + mod[channel].get(getSampleRate(), modFreq[channel]) * width) * getSampleRate();
+            float maxWidth = std::min(curDelay.get(channel), MAX_DELAY - curDelay.get(channel));
+            float width = hasMod.get(0) ? maxWidth * modWidth.get(channel) : 0;
+            delayOffset = (curDelay.get(channel) + mod[channel].get(getSampleRate(), modFreq.get(channel)) * width) * getSampleRate();
 
             float delayOut = delayBuf.getOffset(channel, delayOffset);
 
@@ -192,19 +176,24 @@ void SimpleDelayAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
             float filterOut = 0;
             damp.put(channel, delayOut);
             float sum = 0;
-            for (int i = 0; i < cutoff[channel]; i++) {
+            for (int i = 0; i < cutoff.get(channel); i++) {
                 sum += damp.getOffset(channel, i);
             }
-            filterOut = sum / cutoff[channel];
+            filterOut = sum / cutoff.get(channel);
 
             // Get the incoming sample
             float channelSample = buffer.getSample(channel, sample);
 
             // Set the processing chain output sample
             chainOuts[channel] = channelSample + filterOut;
-
+            
+            // Mix outgoing signals
+            float wetSig = filterOut * sin(M_PI / 2 * mix.get(0));
+            float drySig = channelSample * cos(M_PI / 2 * mix.get(0));
+            float output = drySig + wetSig;
+            
             // Set the outgoing sample
-            buffer.setSample(channel, sample, (filterOut * wet) + (channelSample * dry));
+            buffer.setSample(channel, sample, output);
         }
 
         // Place samples into the delay buffers for each channel, including crossing
@@ -212,7 +201,7 @@ void SimpleDelayAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
         // data from previously processed sample as no sample is placed until after
         // the processing chain is finished).
         for (int channel = 0; channel < 2; channel++) {
-            delayBuf.put(channel, chainOuts[1 - channel] * gCross[channel] + chainOuts[channel] * g[channel]);
+            delayBuf.put(channel, chainOuts[1 - channel] * gCross.get(channel) * hasCross.get(0) + chainOuts[channel] * g.get(channel));
         }
     }
 }

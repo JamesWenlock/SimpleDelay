@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT name="SimpleDelay" projectType="audioplug" buildStandalone="1"
-              jucerVersion="5.3.2" pluginFormats="buildVST,buildStandalone"
-              buildVST="1" buildVST3="0" buildAU="0" buildAUv3="0" buildRTAS="0"
-              buildAAX="0" enableIAA="0" id="e9CNbF">
+<JUCERPROJECT name="SimpleDelay" projectType="audioplug" jucerVersion="5.4.1"
+              id="e9CNbF" pluginFormats="buildVST3">
   <MAINGROUP id="dU8So3" name="SimpleDelay">
     <GROUP id="{A6B46EFF-53DD-3BB4-7C4E-8F543353AB84}" name="Source">
+      <FILE id="oOcZtK" name="RandParam.cpp" compile="1" resource="0" file="Source/RandParam.cpp"/>
       <FILE id="eXslaV" name="DelayBuffer.h" compile="0" resource="0" file="Source/DelayBuffer.h"/>
+      <FILE id="PMYCWa" name="RandParam.h" compile="0" resource="0" file="Source/RandParam.h"/>
       <FILE id="VpzcNZ" name="DelayBuffer.cpp" compile="1" resource="0" file="Source/DelayBuffer.cpp"/>
       <FILE id="bRS09Y" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
@@ -20,7 +20,7 @@
     </GROUP>
   </MAINGROUP>
   <LIVE_SETTINGS>
-    <OSX/>
+    <OSX buildEnabled="1"/>
   </LIVE_SETTINGS>
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX">

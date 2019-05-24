@@ -43,7 +43,7 @@ SimpleDelayAudioProcessorEditor::~SimpleDelayAudioProcessorEditor()
 
 float SimpleDelayAudioProcessorEditor::getRNG(int RNG, float lo, float hi) {
     float range = hi - lo;
-    return (processor.rand % RNG) / (float) RNG * range + lo;
+    return (processor.seed % RNG) / (float) RNG * range + lo;
 }
 
 void SimpleDelayAudioProcessorEditor::buttonClicked(Button * thisBtn)
@@ -54,14 +54,70 @@ void SimpleDelayAudioProcessorEditor::buttonClicked(Button * thisBtn)
     }
     else if (thisBtn == &right)
     {
-        processor.rand = rand();
-        for (int channel = 0; channel < processor.NUM_CHANNELS; channel++) {
-            processor.curDelay[channel] = getRNG(processor.CUR_DELAY_RNG[channel], 0, processor.maxDelay);
-        }
-        
-        debugText.setText("lCurDelay: " + (String) processor.curDelay[0] + " | rCurDelay: " + (String) processor.curDelay[1], dontSendNotification);
+        calcParamVals();
     }
 }
+
+void SimpleDelayAudioProcessorEditor::calcParamVals()
+{
+    processor.seed = rand();
+    
+    processor.mix.updateParam(processor.seed);
+    processor.cutoff.updateParam(processor.seed);
+    processor.hasCross.updateParam(processor.seed);
+    processor.gCross.updateParam(processor.seed);
+    processor.g.updateParam(processor.seed);
+    processor.hasMod.updateParam(processor.seed);
+    processor.modFreq.updateParam(processor.seed);
+    processor.modWidth.updateParam(processor.seed);
+    processor.curDelay.updateParam(processor.seed);
+    
+    debugText.setText("lCurDelay: " + (String) processor.curDelay.get(0) + " | rCurDelay: " + (String) processor.curDelay.get(1)
+                      + "\nHasMod: " + (String) processor.hasMod.get(0)
+                      + "\nlModWidth: " + (String) processor.modWidth.get(0) + " | rModWidth: " + (String) processor.modWidth.get(1)
+                      + "\nlModFreq: " + (String) processor.modFreq.get(0) + " | rModFreq: " + (String) processor.modFreq.get(1)
+                      + "\nlG: " + (String) processor.g.get(0) + " | rG: " + (String) processor.g.get(1)
+                      + "\nHasCross: " + (String) processor.hasCross.get(0)
+                      + "\nlGCross: " + (String) processor.gCross.get(0) + " | rGCross: " + (String) processor.gCross.get(1)
+                      + "\nlCutoff: " + (String) processor.cutoff.get(0) + " | rCutoff: " + (String) processor.cutoff.get(1)
+                      + "\nmix: " + (String) processor.mix.get(0)
+                      , dontSendNotification);
+}
+
+bool SimpleDelayAudioProcessorEditor::isSync(int rng, float likelihood) {
+    return getRNG(rng, 0, 1) > likelihood;
+}
+
+/*
+ float mapExp(float input) {
+    var base = 4;
+    return pow(base, (input + 1)) * (1 / (base * (base - 1)))
+ }
+
+ float mapBi(float input) {
+    if (input > likelihood)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0
+    }
+ }
+ 
+ float map(float input) {
+    var range = hi - lo;
+    var output = input;
+    switch(curve)
+    {
+        case "exp" : output = mapExp(input);
+        break;
+        case "bi" : output = mapBi(input)
+        break;
+    }
+    output = output * range + lo;
+ }
+ */
 
 //==============================================================================
 void SimpleDelayAudioProcessorEditor::paint (Graphics& g)
