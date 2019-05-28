@@ -102,8 +102,8 @@ void SimpleDelayAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-    delayBuf = DelayBuffer(MAX_DELAY * getSampleRate(), 2);
-    damp = DelayBuffer(getSampleRate(), 2);
+    delayBuf = std::unique_ptr<DelayBuffer>(new DelayBuffer(MAX_DELAY * getSampleRate(), 2));
+    damp = std::unique_ptr<DelayBuffer>(new DelayBuffer(getSampleRate(), 2));
 }
 
 void SimpleDelayAudioProcessor::releaseResources()
@@ -170,14 +170,14 @@ void SimpleDelayAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
             float width = hasMod.get(0) ? maxWidth * modWidth.get(channel) : 0;
             delayOffset = (curDelay.get(channel) + mod[channel].get(getSampleRate(), modFreq.get(channel)) * width) * getSampleRate();
 
-            float delayOut = delayBuf.getOffset(channel, delayOffset);
+            float delayOut = delayBuf->getOffset(channel, delayOffset);
 
             // Dampen (low pass filter) the delay output
             float filterOut = 0;
-            damp.put(channel, delayOut);
+            damp->put(channel, delayOut);
             float sum = 0;
             for (int i = 0; i < cutoff.get(channel); i++) {
-                sum += damp.getOffset(channel, i);
+                sum += damp->getOffset(channel, i);
             }
             filterOut = sum / cutoff.get(channel);
 
@@ -201,7 +201,8 @@ void SimpleDelayAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
         // data from previously processed sample as no sample is placed until after
         // the processing chain is finished).
         for (int channel = 0; channel < 2; channel++) {
-            delayBuf.put(channel, chainOuts[1 - channel] * gCross.get(channel) * hasCross.get(0) + chainOuts[channel] * g.get(channel));
+            delayBuf->put(channel, chainOuts[1 - channel] * gCross.get(channel) * hasCross.get(0)
+                                    + chainOuts[channel] * g.get(channel));
         }
     }
 }

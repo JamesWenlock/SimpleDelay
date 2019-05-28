@@ -132,8 +132,8 @@ public:
     RandParam mix = RandParam(1, false, MIX_RNG, mixLo, mixHi, 0, 0, "lin");
     
 private:
-    DelayBuffer delayBuf;
-    DelayBuffer damp;
+    std::unique_ptr<DelayBuffer> delayBuf;
+    std::unique_ptr<DelayBuffer> damp;
     dsp::LookupTable<float> waveTable;
     unsigned int tableSize;
     Osc mod[NUM_CHANNELS];
