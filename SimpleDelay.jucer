@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT name="SimpleDelay" projectType="audioplug" jucerVersion="5.4.1"
+<JUCERPROJECT name="SimpleDelay" projectType="audioplug" jucerVersion="5.4.4"
               id="e9CNbF" pluginFormats="buildVST3">
   <MAINGROUP id="dU8So3" name="SimpleDelay">
     <GROUP id="{A6B46EFF-53DD-3BB4-7C4E-8F543353AB84}" name="Source">
@@ -70,5 +70,5 @@
     <MODULE id="juce_opengl" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_video" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
   </MODULES>
-  <JUCEOPTIONS/>
+  <JUCEOPTIONS JUCE_VST3_CAN_REPLACE_VST2="0"/>
 </JUCERPROJECT>
